@@ -1,4 +1,5 @@
 const path = require('path');
+const webpack = require('webpack');
 const HtmlWebpackPlugin = require('html-webpack-plugin');
 const WebpackObfuscator = require('webpack-obfuscator');
 const TerserPlugin = require('terser-webpack-plugin');
@@ -38,6 +39,11 @@ module.exports = (env, argv) => {
       ]
     },
     plugins: [
+      // 注入环境变量到前端代码
+      new webpack.DefinePlugin({
+        'process.env.REACT_APP_API_BASE_URL': JSON.stringify(process.env.REACT_APP_API_BASE_URL || ''),
+        'process.env.NODE_ENV': JSON.stringify(argv.mode || 'development'),
+      }),
       new HtmlWebpackPlugin({
         template: './public/index.html',
         filename: 'index.html',

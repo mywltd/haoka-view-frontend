@@ -76,7 +76,9 @@ class CryptoClient {
     try {
       // 生成轻量客户端指纹盐（动态）
       this._deviceSalt = await this.computeDeviceSalt();
-      const pkResp = await fetch('/api/public-key', {
+      // 动态导入API配置模块
+      const apiConfig = await import('./apiConfig');
+      const pkResp = await fetch(apiConfig.buildApiUrl(apiConfig.API_ENDPOINTS.PUBLIC_KEY), {
         headers: { 'X-Obf-Salt': this._deviceSalt || 'nosalt' }
       });
       const pk = await pkResp.json();
@@ -93,7 +95,7 @@ class CryptoClient {
       const encryptedKey = await crypto.subtle.encrypt({ name: 'RSA-OAEP' }, spkiKey, sessionKey);
       const b64Key = this.arrayBufferToBase64(encryptedKey);
 
-      const resp = await fetch('/api/session/init', {
+      const resp = await fetch(apiConfig.buildApiUrl(apiConfig.API_ENDPOINTS.SESSION_INIT), {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'X-Obf-Salt': this._deviceSalt },
         body: JSON.stringify({ encryptedKey: b64Key })

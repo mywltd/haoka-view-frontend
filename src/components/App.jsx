@@ -22,6 +22,7 @@ import cryptoClient from '../utils/crypto';
 import { isNiceNumber, parseCustomNumbers } from '../utils/helpers';
 import useDebounce from '../utils/useDebounce';
 import { initSecurity } from '../utils/antiDebug';
+import { buildApiUrl, API_ENDPOINTS } from '../utils/apiConfig';
 import FilterToolbar from './FilterToolbar';
 import StatsPanel from './StatsPanel';
 import NumberCard from './NumberCard';
@@ -209,7 +210,7 @@ function App() {
         }
         currentFetchController.current = new AbortController();
 
-        const response = await fetch('/api/query-numbers', {
+        const response = await fetch(buildApiUrl(API_ENDPOINTS.QUERY_NUMBERS), {
           method: 'POST',
           headers: {
             'Content-Type': 'application/json',
@@ -253,7 +254,7 @@ function App() {
         if (response.status === 401) {
           try {
             await cryptoClient.initSession();
-            const retryResp = await fetch('/api/query-numbers', {
+            const retryResp = await fetch(buildApiUrl(API_ENDPOINTS.QUERY_NUMBERS), {
               method: 'POST',
               headers: {
                 'Content-Type': 'application/json',
@@ -437,7 +438,7 @@ function App() {
       setError(null);
       setRateLimited(false);
 
-      const response = await fetch('/api/index', {
+      const response = await fetch(buildApiUrl(API_ENDPOINTS.INDEX), {
         headers: {
           ...(cryptoClient.sessionToken ? { 
             'X-Session-Token': await cryptoClient.obfuscateTransport(cryptoClient.sessionToken),
@@ -461,7 +462,7 @@ function App() {
       if (response.status === 401) {
         try {
           await cryptoClient.initSession();
-          const retryResp = await fetch('/api/index', {
+          const retryResp = await fetch(buildApiUrl(API_ENDPOINTS.INDEX), {
             headers: {
               ...(cryptoClient.sessionToken ? { 'X-Session-Token': cryptoClient.sessionToken } : {})
             }
